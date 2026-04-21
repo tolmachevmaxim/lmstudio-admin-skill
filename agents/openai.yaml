@@ -1,0 +1,4 @@
+interface:
+  display_name: "LM Studio Admin"
+  short_description: "Manage LM Studio models, server, and diagnostics"
+  default_prompt: "Use $lmstudio-admin to inspect my LM Studio server and load or unload the right local model."
