@@ -224,6 +224,24 @@ def cmd_models(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_variants(args: argparse.Namespace) -> int:
+    cmd = ["ls", "--variants", "--json"]
+    if args.model:
+        cmd = ["ls", args.model, "--json"]
+    proc = run_lms(cmd)
+    if proc.returncode != 0:
+        raise LMStudioError(proc.stderr.strip() or "Failed to list model variants")
+    text = proc.stdout.strip()
+    if not text:
+        raise LMStudioError("`lms ls` returned no output")
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise LMStudioError("Failed to parse `lms ls` JSON output") from exc
+    print(json.dumps(payload, indent=2, ensure_ascii=True))
+    return 0
+
+
 def cmd_load(args: argparse.Namespace) -> int:
     payload: Dict[str, Any] = {"model": args.model}
     for field in (
@@ -353,6 +371,16 @@ def build_parser() -> argparse.ArgumentParser:
     models.add_argument("--loaded-only", action="store_true", help="Only show loaded models")
     models.add_argument("--json", action="store_true", help="Emit JSON output")
     models.set_defaults(func=cmd_models)
+
+    variants = subparsers.add_parser(
+        "variants", help="List downloaded variants through `lms ls --variants --json`"
+    )
+    variants.add_argument(
+        "model",
+        nargs="?",
+        help="Optional model key, for example google/gemma-4-e4b or qwen/qwen3.5-9b",
+    )
+    variants.set_defaults(func=cmd_variants)
 
     load = subparsers.add_parser("load", help="Load a model through the REST API")
     load.add_argument("model", help="Model key, for example qwen/qwen3-14b")

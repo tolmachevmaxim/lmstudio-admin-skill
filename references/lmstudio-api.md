@@ -26,6 +26,7 @@ Use these narrow search terms before opening more of this file:
 - `POST /api/v1/models/load`
 - `POST /api/v1/models/unload`
 - `POST /api/v1/models/download`
+- `lms ls --variants`
 - `lms load`
 - `lms server start`
 - `lms server status`
@@ -97,11 +98,17 @@ Purpose:
 
 - inspect async download jobs by `job_id`
 
+Limitation:
+
+- there is no reliable public endpoint for "list every active download job"
+- if you do not already have a `job_id`, you may need to inspect the local UI or internal LM Studio files instead of the REST API
+
 ## CLI Notes
 
 Use `lms` when the task is about:
 
 - server lifecycle: `server start`, `server stop`, `server status`
+- model variant inspection: `lms ls --variants --json`
 - optional model estimation with `lms load --estimate-only`
 
 Important `lms load` flags from current docs:
@@ -111,6 +118,17 @@ Important `lms load` flags from current docs:
 - `--ttl`
 - `--identifier`
 - `--estimate-only`
+
+Variant inspection:
+
+- `lms ls --variants --json`
+- `lms ls <model-key> --json`
+
+Practical note:
+
+- LM Studio can report `selectedVariant` separately from the base model key
+- `lms load <base-model-key>` often loads the currently selected variant
+- explicit variant keys such as `google/gemma-4-e4b@q8_0` may not always work with `lms load --estimate-only`, so inspect with `lms ls` first
 
 Important server commands:
 
@@ -126,6 +144,10 @@ Bootstrap notes from current CLI docs:
 ## Practical Guidance
 
 - Prefer REST for model inventory and load or unload because it is easier to parse and more stable for automation.
+- Prefer `lms ls --variants --json` when the user cares about a specific quantization such as `Q6_K` vs `Q8_0`.
 - Prefer `lms server status --json --quiet` for machine-readable server checks.
+- Treat `lms load --estimate-only` as a device-fit estimate, not proof that Claude Code or another agentic client will run well with the same model.
+- For full Claude Code sessions, long system prompts plus tools and skills can consume far more context than the user prompt alone. Context failures may come from prompt expansion rather than the user's visible message.
+- For a single active Claude Code session, prefer `parallel=1`. Higher `parallel` trades latency for throughput.
 - If auth is enabled, send `Authorization: Bearer <token>`.
 - Environment names commonly used by wrappers are `LMSTUDIO_BASE_URL`, `LMSTUDIO_API_TOKEN`, and `LM_API_TOKEN`.
