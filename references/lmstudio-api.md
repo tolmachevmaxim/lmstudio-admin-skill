@@ -2,6 +2,14 @@
 
 Use this file only when the bundled script does not already cover the task. The goal is retrieval-first operation with minimal prompt bloat.
 
+## Contents
+
+- [Sources](#sources)
+- [Search Patterns](#search-patterns)
+- [REST Endpoints](#rest-endpoints)
+- [CLI Notes](#cli-notes)
+- [Practical Guidance](#practical-guidance)
+
 ## Sources
 
 - OpenAI Codex skills docs: <https://developers.openai.com/codex/skills>
