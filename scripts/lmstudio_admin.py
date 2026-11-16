@@ -301,9 +301,8 @@ def cmd_download(args: argparse.Namespace) -> int:
 
 def cmd_download_status(args: argparse.Namespace) -> int:
     base_url = normalize_base_url(args.base_url)
-    query = parse.urlencode({"job_id": args.job_id})
     result = http_request(
-        "GET", build_rest_url(base_url, "models/download/status") + "?" + query
+        "GET", build_rest_url(base_url, f"models/download/status/{parse.quote(args.job_id, safe='')}")
     )
     print(json.dumps(result, indent=2, ensure_ascii=True))
     return 0
